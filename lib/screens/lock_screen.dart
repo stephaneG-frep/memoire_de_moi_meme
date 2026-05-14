@@ -39,41 +39,64 @@ class _LockScreenState extends State<LockScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Icon(Icons.lock_outline, size: 56),
-              const SizedBox(height: 10),
-              Text(
-                'MoodBook verrouillé',
-                style: Theme.of(context).textTheme.headlineSmall,
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: isDark
+                ? const [
+                    Color(0xFF0E1526),
+                    Color(0xFF172846),
+                    Color(0xFF1B3054),
+                  ]
+                : const [
+                    Color(0xFFFFF0E6),
+                    Color(0xFFF9E3F6),
+                    Color(0xFFE3F0FF),
+                  ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        child: Center(
+          child: Card(
+            margin: const EdgeInsets.all(24),
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.lock_outline, size: 56),
+                  const SizedBox(height: 10),
+                  Text(
+                    'MoodBook verrouillé',
+                    style: Theme.of(context).textTheme.headlineSmall,
+                  ),
+                  const SizedBox(height: 20),
+                  TextField(
+                    controller: _pinCtrl,
+                    maxLength: 6,
+                    obscureText: true,
+                    keyboardType: TextInputType.number,
+                    decoration: InputDecoration(
+                      labelText: 'Code PIN',
+                      errorText: _error,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  FilledButton(
+                    onPressed: _unlockWithPin,
+                    child: const Text('Déverrouiller'),
+                  ),
+                  TextButton.icon(
+                    onPressed: _unlockWithBiometric,
+                    icon: const Icon(Icons.fingerprint),
+                    label: const Text('Biométrie'),
+                  ),
+                ],
               ),
-              const SizedBox(height: 20),
-              TextField(
-                controller: _pinCtrl,
-                maxLength: 6,
-                obscureText: true,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  labelText: 'Code PIN',
-                  errorText: _error,
-                ),
-              ),
-              const SizedBox(height: 10),
-              FilledButton(
-                onPressed: _unlockWithPin,
-                child: const Text('Déverrouiller'),
-              ),
-              TextButton.icon(
-                onPressed: _unlockWithBiometric,
-                icon: const Icon(Icons.fingerprint),
-                label: const Text('Biométrie'),
-              ),
-            ],
+            ),
           ),
         ),
       ),

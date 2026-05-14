@@ -17,8 +17,8 @@ Future<void> main() async {
 
   Hive.registerAdapter(JournalEntryAdapter());
 
-  final journalBox = await Hive.openBox<JournalEntry>('journal_entries');
-  final settingsBox = await Hive.openBox('app_settings');
+  final journalBox = await Hive.openBox<JournalEntry>('journal_entries_v2');
+  final settingsBox = await Hive.openBox('app_settings_v2');
 
   runApp(MoodBookApp(journalBox: journalBox, settingsBox: settingsBox));
 }

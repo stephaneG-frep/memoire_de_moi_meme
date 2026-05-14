@@ -17,6 +17,7 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<JournalProvider>();
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       appBar: AppBar(
         title: const Text('MoodBook'),
@@ -59,57 +60,76 @@ class HomeScreen extends StatelessWidget {
         icon: const Icon(Icons.edit_note),
         label: const Text('Nouvelle entrée'),
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(12),
-        children: [
-          QuoteCard(),
-          const SizedBox(height: 8),
-          Card(
-            child: ListTile(
-              leading: const Icon(Icons.today_outlined),
-              title: const Text('Résumé du jour'),
-              subtitle: Text(provider.todaySummary),
-            ),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: isDark
+                ? const [
+                    Color(0xFF0E1526),
+                    Color(0xFF172846),
+                    Color(0xFF1B3054),
+                  ]
+                : const [
+                    Color(0xFFFFF0E6),
+                    Color(0xFFF9E3F6),
+                    Color(0xFFE3F0FF),
+                  ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
           ),
-          const SizedBox(height: 8),
-          Text(
-            'Dernières entrées',
-            style: Theme.of(context).textTheme.titleLarge,
-          ),
-          const SizedBox(height: 8),
-          if (provider.latestEntries.isEmpty)
-            const Card(
-              child: Padding(
-                padding: EdgeInsets.all(16),
-                child: Text(
-                  'Aucune entrée pour l\'instant. Commence ton premier souvenir.',
-                ),
+        ),
+        child: ListView(
+          padding: const EdgeInsets.all(12),
+          children: [
+            QuoteCard(),
+            const SizedBox(height: 8),
+            Card(
+              child: ListTile(
+                leading: const Icon(Icons.today_outlined),
+                title: const Text('Résumé du jour'),
+                subtitle: Text(provider.todaySummary),
               ),
-            )
-          else
-            ...provider.latestEntries.map(
-              (entry) => EntryCard(
-                entry: entry,
-                onTap: () async {
-                  if (entry.isLocked) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Capsule encore verrouillée.'),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Dernières entrées',
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+            const SizedBox(height: 8),
+            if (provider.latestEntries.isEmpty)
+              const Card(
+                child: Padding(
+                  padding: EdgeInsets.all(16),
+                  child: Text(
+                    'Aucune entrée pour l\'instant. Commence ton premier souvenir.',
+                  ),
+                ),
+              )
+            else
+              ...provider.latestEntries.map(
+                (entry) => EntryCard(
+                  entry: entry,
+                  onTap: () async {
+                    if (entry.isLocked) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Capsule encore verrouillée.'),
+                        ),
+                      );
+                      return;
+                    }
+                    await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => EntryDetailScreen(entry: entry),
                       ),
                     );
-                    return;
-                  }
-                  await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => EntryDetailScreen(entry: entry),
-                    ),
-                  );
-                },
-                onDelete: () => provider.deleteEntry(entry.id),
+                  },
+                  onDelete: () => provider.deleteEntry(entry.id),
+                ),
               ),
-            ),
-        ],
+          ],
+        ),
       ),
     );
   }
